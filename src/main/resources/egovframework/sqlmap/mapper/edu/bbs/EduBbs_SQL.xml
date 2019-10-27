@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="eduBbs">
+	
+	<select id="selectBoardAdminList" resultType="egovMap">
+		SELECT BOARD_INDEX
+			,BOARD_NAME
+			,BOARD_STATE
+		FROM TB_ADMIN_KJH
+	</select>
+	<update id="adminBoardDelete" parameterType="java.util.HashMap">
+		update tb_admin_kjh 
+		set board_state = 1 
+		where board_index=#{boardIndex}
+	</update>
+	<insert id="adminBoardInsert" parameterType="java.util.HashMap">
+		insert into tb_admin_kjh
+		values(board_seq_kjh.nextval
+			,#{boardName}
+			,#{boardCategory}
+			,#{boardDetail}
+			,#{boardInsert}
+			,#{boardDelete}
+			,#{boardUpdate}
+			,#{boardPrivate}
+			,#{boardState})
+	</insert>
+	<select id="bbsList" parameterType="java.util.HashMap" resultType="egovMap">
+		select
+			a.*
+			,b.*
+		from tb_admin_kjh a
+		join tb_bbs_kjh b
+		on a.board_index=b.bbs_index
+		where bbs_index = #{bbsIndex}
+	</select>
+	<select id="bbsListInfo" parameterType="java.util.HashMap" resultType="egovMap">
+		select *
+		from tb_admin_kjh 
+		where board_index=#{bbsIndex}
+	</select>
+	<update id="bbsHit" parameterType="java.util.HashMap">
+		update tb_bbs_kjh
+		set bbs_hit=bbs_hit+1
+		where bbs_no=#{bbsNo}
+	</update>
+	<select id="bbsDetail" parameterType="java.util.HashMap" resultType="egovMap">
+		select
+			a.*
+			,b.*
+		from tb_admin_kjh a
+		join tb_bbs_kjh b
+		on a.board_index=b.bbs_index
+		where bbs_no=#{bbsNo}
+	</select>
+	<update id="bbsUpdate" parameterType="java.util.HashMap">
+		update tb_bbs_kjh
+		set bbs_title=#{bbsTitle}
+			,bbs_cont=#{bbsCont}
+			,bbs_cate=#{bbsCate}
+			,bbs_modiwriter=#{bbsModiwriter}
+			,bbs_modidate=sysdate
+		where bbs_no=#{bbsNo}
+	</update>
+	<update id="bbsDelete" parameterType="java.util.HashMap">
+		update tb_bbs_kjh
+		set bbs_state=1
+		where bbs_no=#{bbsNo}
+	</update>
+	<insert id="bbsInsert" parameterType="java.util.HashMap">
+		<selectKey resultType="int" keyProperty="bbsNo" order="BEFORE">
+        	 select max(bbs_no)+1 
+        	 from tb_bbs_kjh        
+       </selectKey> 
+       	insert into tb_bbs_kjh(bbs_no,bbs_index,bbs_cate,bbs_title,bbs_writer,bbs_cont,bbs_regdate
+			<if test="bbsPrivate != null">,bbs_private</if>)
+       	values(#{bbsNo}
+       		,#{bbsIndex}
+       		,#{bbsCate}
+       		,#{bbsTitle}
+       		,#{bbsWriter}
+       		,#{bbsCont}
+       		,sysdate
+       		<if test="bbsPrivate != null">,#{bbsPrivate}</if>)
+	</insert>
+</mapper>
